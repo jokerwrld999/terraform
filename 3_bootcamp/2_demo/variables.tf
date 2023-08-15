@@ -17,7 +17,7 @@ variable "subnet_zone" {
 
 }
 
-variable "key_name" {
+variable "ssh_key_name" {
   description = "SSH Key Name"
 }
 
@@ -27,11 +27,6 @@ variable "sg_ports" {
       {
         from   = 22
         to     = 22
-        source = "0.0.0.0/0"
-      },
-      {
-        from   = 25
-        to     = 25
         source = "0.0.0.0/0"
       },
       {

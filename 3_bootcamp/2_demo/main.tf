@@ -77,24 +77,25 @@ resource "aws_instance" "web" {
   ami                    = data.aws_ami.ubuntu.id
   instance_type          = "t2.micro"
   subnet_id              = aws_subnet.web_subnet.id
+  associate_public_ip_address = true
   vpc_security_group_ids = [aws_security_group.custom_sec_group.id]
   key_name               = aws_key_pair.generated_key.key_name
   user_data              = <<-EOF
                     #!/bin/bash
                     # Install docker
-                    apt-get update
-                    apt-get install -y apt-transport-https ca-certificates curl software-properties-common
+                    sudo apt-get update
+                    sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
                     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-                    add-apt-repository \
+                    sudo add-apt-repository \
                        "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
                        $(lsb_release -cs) \
                        stable"
-                    apt-get update
-                    apt-get install -y docker-ce
-                    usermod -aG docker ubuntu
+                    sudo apt-get update
+                    sudo apt-get install -y docker-ce
+                    sudo usermod -aG docker ubuntu
                     sudo usermod -aG docker $USER
                     # Run Nginx Container
-                    docker run --name some-nginx -d -p 80:80 some-content-nginx
+                    docker run --name nginx -d -p 80:80 nginx
                   EOF
 
   tags = {
@@ -107,9 +108,10 @@ resource "aws_security_group" "custom_sec_group" {
   vpc_id = aws_vpc.custom_vpc.id
 
   dynamic "ingress" {
-    for_each = var.sg_ports[*]
-
+    for_each = var.sg_ports.ports[*]
     content {
+
+
       from_port        = ingress.value.from
       to_port          = ingress.value.to
       protocol         = "tcp"
@@ -137,6 +139,13 @@ resource "tls_private_key" "private_key" {
 }
 
 resource "aws_key_pair" "generated_key" {
-  key_name   = var.key_name
+  key_name   = var.ssh_key_name
   public_key = tls_private_key.private_key.public_key_openssh
+}
+
+resource "local_sensitive_file" "pem_file" {
+  filename = pathexpand("./${var.ssh_key_name}.pem")
+  file_permission = "600"
+  directory_permission = "700"
+  content = tls_private_key.private_key.private_key_pem
 }
