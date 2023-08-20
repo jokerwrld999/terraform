@@ -24,7 +24,7 @@ resource "aws_instance" "web" {
   vpc_security_group_ids      = [aws_security_group.custom_sec_group.id]
   key_name                    = aws_key_pair.generated_key.key_name
 
-  user_data = file("${var.entry_script_path}")
+  #user_data = file("${var.entry_script_path}")
 
   tags = {
     Name = "${var.env_prefix}-server"
@@ -75,7 +75,7 @@ resource "aws_key_pair" "generated_key" {
 }
 
 resource "local_sensitive_file" "pem_file" {
-  filename             = pathexpand("../${var.ssh_key_name}.pem")
+  filename             = pathexpand("~/.ssh/${var.ssh_key_name}.pem")
   file_permission      = "600"
   directory_permission = "700"
   content              = tls_private_key.private_key.private_key_pem
