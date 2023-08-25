@@ -1,16 +1,16 @@
 terraform {
- required_providers {
-   aws = {
-     source  = "hashicorp/aws"
-     version = "~> 3.0"
-   }
- }
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 3.0"
+    }
+  }
 }
 
 # Configuring the AWS Provider
 # !!Use your own access and secret keys!!
 provider "aws" {
-    region = "us-west-1"
+  region = "us-west-1"
 }
 
 
@@ -25,11 +25,11 @@ resource "aws_vpc" "production" {
 
 
 # Creating a subnet in the VPC
-resource "aws_subnet" "webapps"{
-  vpc_id = aws_vpc.production.id
-  cidr_block = "10.0.0.0/24"
+resource "aws_subnet" "webapps" {
+  vpc_id            = aws_vpc.production.id
+  cidr_block        = "10.0.0.0/24"
   availability_zone = "us-west-1b"
-  
+
   tags = {
     "Name" = "Web Applictations Subnet"
   }

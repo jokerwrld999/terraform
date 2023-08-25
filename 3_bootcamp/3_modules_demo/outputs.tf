@@ -1,4 +1,4 @@
 output "public_ip" {
   description = "Public IP"
-  value       = module.myapp-webserver.public_ip
+  value       = module.myapp_webserver.public_ip
 }
